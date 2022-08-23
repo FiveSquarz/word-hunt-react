@@ -1,2 +1,0 @@
-body{font:14px Century Gothic,Futura,sans-serif;margin:3vmin}.board-row:after{clear:both;content:"";display:table}.square{background:#fff;border:.15vmin solid #999;float:left;height:18vmin;margin-right:-1px;margin-top:-1px;padding:0;width:18vmin}.detector,.square{align-items:center;display:flex;justify-content:center}.detector{background:transparent;border:.15vmin solid red;font-size:7vmin;font-weight:700;height:70%;-webkit-user-select:none;user-select:none;width:70%}.game{display:flex;justify-content:center;margin-bottom:1vmin}
-/*# sourceMappingURL=main.433ded13.css.map*/
