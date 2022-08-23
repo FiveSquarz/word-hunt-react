@@ -285,7 +285,8 @@ class Game extends React.Component {
       this.setState({
         usedWords: this.state.usedWords.concat(attempt)
       })
-      new Audio(newWordSound).play()
+      this.newWordSound.currentTime = 0
+      this.newWordSound.play()
     }
   }
 
@@ -316,7 +317,12 @@ class Game extends React.Component {
             </div>
           </div>
           <div className="game">
-            <button onClick={() => this.startNewGame()} style={{fontSize: "5vmin"}}>Start New Game</button>
+            <button onClick={() => {
+              this.newWordSound = new Audio(newWordSound)
+              this.newWordSound.play()
+              this.newWordSound.pause()
+              this.startNewGame()
+              }} style={{fontSize: "5vmin"}}>Start New Game</button>
           </div>
         </div>
       </div>
