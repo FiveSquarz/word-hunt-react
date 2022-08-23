@@ -3,6 +3,7 @@ body {
   margin: 3vmin;
   touch-action: none;
   background-color: beige;
+  user-select: none;
 }
 
 .board-row:after {
@@ -36,7 +37,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  user-select: none;
 }
 
 .game {
@@ -47,4 +47,7 @@ body {
 
 button {
   background-color: beige;
+  border: 0.15vmin solid #999;
+  border-radius: 2vmin;
+  color: black;
 }
