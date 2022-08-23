@@ -253,7 +253,6 @@ class Game extends React.Component {
   }
 
   isInAttempt(index) {
-    //console.log(this.state.tiles)
     return this.state.sequence.includes(index)
   }
 
@@ -310,11 +309,7 @@ class Game extends React.Component {
             Time Remaining: {this.state.timeRemaining}
           </div>
           <div className="game">
-            <div className="game">
-              <div className="game-board">
-                <Board tiles={this.state.tiles} functions={this.getFunctions()} />
-              </div>
-            </div>
+            <Board tiles={this.state.tiles} functions={this.getFunctions()} />
           </div>
           <div className="game">
             <button onClick={() => {
