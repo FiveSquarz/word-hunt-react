@@ -1,6 +1,8 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
   margin: 3vmin;
+  touch-action: none;
+  background-color: beige;
 }
 
 .board-row:after {
@@ -13,22 +15,23 @@ body {
   background: #fff;
   border: 0.15vmin solid #999;
   float: left;
-  height: 6vmin;
+  height: 18vmin;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
-  width: 6vmin;
+  width: 18vmin;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 2vmin;
 }
 
 .detector {
   background: transparent;
-  border: 0.15vmin solid green;
+  border: 0.15vmin solid none;
   width: 70%;
   height: 70%;
-  font-size: 3vmin;
+  font-size: 7vmin;
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -40,4 +43,8 @@ body {
   display: flex;
   justify-content: center;
   margin-bottom: 1vmin;
+}
+
+button {
+  background-color: beige;
 }

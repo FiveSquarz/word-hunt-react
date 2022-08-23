@@ -2,12 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import wordListRaw from "./RIDYHEW.txt"
+import newWordSound from './newWord.wav'
 
 class Square extends React.Component {
   render() {
     return (
-      <div className="square">
-        <div className="detector" id={"detectorIndex" + this.props.index} style={{ backgroundColor: this.props.color }}>
+      <div className="square" style={{backgroundColor: this.props.color}}>
+        <div className="detector" id={"detectorIndex" + this.props.index}>
           {this.props.letter}
         </div>
       </div>
@@ -34,38 +35,41 @@ class Board extends React.Component {
     return <Square index={i} letter={this.props.tiles[i]} color={getSquareColor(i)} />
   }
 
+  onMove(info) {
+    if (this.state.pointerDown && this.getTarget(info).className == "detector") {
+      const index = parseInt(this.getTarget(info).id.slice("detectorIndex".length))
+      this.props.functions.tryUpdateSequence(index)
+    }
+  }
+
+  onDown(info) {
+    this.setState({
+      pointerDown: true
+    })
+    if (this.getTarget(info).className == "detector") {
+      const index = parseInt(this.getTarget(info).id.slice("detectorIndex".length))
+      this.props.functions.tryUpdateSequence(index)
+    }
+  }
+
+  onUpOrLeave(info) {
+    this.setState({
+      pointerDown: false
+    })
+    this.props.functions.submitAttempt()
+  }
+
+  getTarget(info) {
+    return document.elementFromPoint(info.clientX, info.clientY)
+  }
+
   render() {
     return (
       <div
-        onPointerMove={(info) => {
-          /*console.log(this.state.pointerDown)
-          if (info.target.className == "detector") {
-            //console.log(info.target.id.slice(-1))
-          }*/
-
-          if (this.state.pointerDown && info.target.className == "detector") {
-            const index = parseInt(info.target.id.slice("detectorIndex".length))
-            this.props.functions.tryUpdateSequence(index)
-          }
-        }}
-        onPointerDown={(info) => {
-          this.setState({
-            pointerDown: true
-          })
-        }}
-        onPointerUp={(info) => {
-          this.setState({
-            pointerDown: false
-          })
-          this.props.functions.submitAttempt()
-        }}
-        onPointerLeave={(info) => {
-          this.setState({
-            pointerDown: false
-          })
-          this.props.functions.submitAttempt()
-        }}
-
+        onPointerMove={this.onMove.bind(this)}
+        onPointerDown={this.onDown.bind(this)}
+        onPointerUp={this.onUpOrLeave.bind(this)}
+        onPointerLeave={this.onUpOrLeave.bind(this)}
       >
         <div className="board-row">
           {this.renderSquare(0)}
@@ -225,18 +229,8 @@ class Game extends React.Component {
         return 50
       case 3:
         return 100
-      case 4:
-        return 400
-      case 5:
-        return 800
-      case 6:
-        return 1400
-      case 7:
-        return 1800
-      case 8:
-        return 2200
       default:
-        return (word.length - 2) * 400
+        return (word.length - 3) * 400
     }
   }
 
@@ -291,6 +285,7 @@ class Game extends React.Component {
       this.setState({
         usedWords: this.state.usedWords.concat(attempt)
       })
+      new Audio(newWordSound).play()
     }
   }
 
@@ -305,22 +300,24 @@ class Game extends React.Component {
 
   render() {
     return (
-      <div>
-        <div className="game">
-          Score: {this.getTotalScore()}
-        </div>
-        <div className="game">
-          Time Remaining: {this.state.timeRemaining}
-        </div>
-        <div className="game">
+      <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <div style={{position: "absolute", top: "50%", transform: "translate(0%, -50%)"}}>
+          <div className="game" style={{fontSize: "5vmin"}}>
+            Score: {this.getTotalScore()}
+          </div>
+          <div className="game" style={{fontSize: "3vmin"}}>
+            Time Remaining: {this.state.timeRemaining}
+          </div>
           <div className="game">
-            <div className="game-board">
-              <Board tiles={this.state.tiles} functions={this.getFunctions()} />
+            <div className="game">
+              <div className="game-board">
+                <Board tiles={this.state.tiles} functions={this.getFunctions()} />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="game">
-          <button onClick={() => this.startNewGame()}>Start New Game</button>
+          <div className="game">
+            <button onClick={() => this.startNewGame()} style={{fontSize: "5vmin"}}>Start New Game</button>
+          </div>
         </div>
       </div>
     )
