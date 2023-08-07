@@ -6,12 +6,6 @@ body {
   user-select: none;
 }
 
-.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
-}
-
 .square {
   background: #fff;
   border: 0.15vmin solid #999;
@@ -39,7 +33,7 @@ body {
   justify-content: center;
 }
 
-.game {
+.format {
   display: flex;
   justify-content: center;
   margin-bottom: 1vmin;

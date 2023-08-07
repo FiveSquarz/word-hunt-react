@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import wordListRaw from "./RIDYHEW.txt"
-import newWordSound from './newWord.wav'
+import wordListRaw from "/RIDYHEW.txt"
+import newWordSound from '/newWord.wav'
 
+//detector is an invisible smaller square used to count selections. 100% sized detectors wouldn't allow for diagonal selections
 class Square extends React.Component {
   render() {
     return (
-      <div className="square" style={{backgroundColor: this.props.color}}>
+      <div className="square" style={{ backgroundColor: this.props.color }}>
         <div className="detector" id={"detectorIndex" + this.props.index}>
           {this.props.letter}
         </div>
@@ -26,18 +27,18 @@ class Board extends React.Component {
   }
 
   renderSquare(i) {
-    let getSquareColor = (index) => {
+    const getSquareColor = (index) => {
       if (this.props.functions.isInAttempt(index)) {
         return this.props.functions.getAttemptColor()
       }
       return "transparent"
     }
-    return <Square index={i} letter={this.props.tiles[i]} color={getSquareColor(i)} />
+    return <Square index={i} letter={this.props.tiles[i]} color={getSquareColor(i)} key={i} />
   }
 
   onMove(info) {
-    if (this.state.pointerDown && this.getTarget(info).className == "detector") {
-      const index = parseInt(this.getTarget(info).id.slice("detectorIndex".length))
+    if (this.state.pointerDown && info.target.className == "detector") {
+      const index = parseInt(info.target.id.slice("detectorIndex".length))
       this.props.functions.tryUpdateSequence(index)
     }
   }
@@ -46,21 +47,17 @@ class Board extends React.Component {
     this.setState({
       pointerDown: true
     })
-    if (this.getTarget(info).className == "detector") {
-      const index = parseInt(this.getTarget(info).id.slice("detectorIndex".length))
+    if (info.target.className == "detector") {
+      const index = parseInt(info.target.id.slice("detectorIndex".length))
       this.props.functions.tryUpdateSequence(index)
     }
   }
 
-  onUpOrLeave(info) {
+  onUpOrLeave() {
     this.setState({
       pointerDown: false
     })
     this.props.functions.submitAttempt()
-  }
-
-  getTarget(info) {
-    return document.elementFromPoint(info.clientX, info.clientY)
   }
 
   render() {
@@ -71,30 +68,14 @@ class Board extends React.Component {
         onPointerUp={this.onUpOrLeave.bind(this)}
         onPointerLeave={this.onUpOrLeave.bind(this)}
       >
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-          {this.renderSquare(3)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(8)}
-          {this.renderSquare(9)}
-          {this.renderSquare(10)}
-          {this.renderSquare(11)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(12)}
-          {this.renderSquare(13)}
-          {this.renderSquare(14)}
-          {this.renderSquare(15)}
-        </div>
+
+        {[...Array(4)].map((_, row) =>
+          <div key={row}>
+            {[...Array(4)].map((_, col) =>
+              this.renderSquare(row * 4 + col)
+            )}
+          </div>
+        )}
       </div>
     )
   }
@@ -106,12 +87,19 @@ class Game extends React.Component {
     super(props)
 
     this.startingTime = 60
+    this.functions = {
+      getAttemptColor: this.getAttemptColor.bind(this),
+      isInAttempt: this.isInAttempt.bind(this),
+      tryUpdateSequence: this.tryUpdateSequence.bind(this),
+      submitAttempt: this.submitAttempt.bind(this)
+    }
 
     this.state = {
       tiles: Array(16).fill(null),
       sequence: [],
       timeRemaining: 0,
-      usedWords: []
+      usedWords: [], 
+      totalScore: 0
     }
 
     const weightedLetterDistribution = {
@@ -142,7 +130,7 @@ class Game extends React.Component {
       "Y": 3,
       "Z": 1,
     }
-    var tempWeightedLetters = []
+    let tempWeightedLetters = []
     for (const [key, value] of Object.entries(weightedLetterDistribution)) {
       tempWeightedLetters = tempWeightedLetters.concat(Array(value).fill(key))
     }
@@ -164,7 +152,8 @@ class Game extends React.Component {
     this.generateTiles()
     this.setState({
       timeRemaining: this.startingTime,
-      usedWords: []
+      usedWords: [],
+      totalScore: 0
     })
     this.handleTimer()
   }
@@ -173,11 +162,11 @@ class Game extends React.Component {
     const maxRepeats = 2
 
     let occurances = {}
-    let getRandomLetter = () => {
+    const getRandomLetter = () => {
       let letter = ""
       do {
         letter = this.weightedLetters[Math.floor(Math.random() * this.weightedLetters.length)]
-      } while ((occurances[letter] ?? -1) >= maxRepeats) //parentheses matter here
+      } while ((occurances[letter] ?? -1) >= maxRepeats)
       occurances[letter] = (occurances[letter] ?? 0) + 1
       return letter
     }
@@ -211,14 +200,6 @@ class Game extends React.Component {
         }
       })
     }, 1000);
-  }
-
-  getTotalScore() {
-    let result = 0
-    for (const word of this.state.usedWords) {
-      result += this.getWordScore(word)
-    }
-    return result
   }
 
   getWordScore(word) {
@@ -262,9 +243,9 @@ class Game extends React.Component {
     }
     const previousIndex = this.state.sequence[this.state.sequence.length - 1]
     if (this.state.sequence.length == 0
-      || Math.abs(index - previousIndex) == 1 && Math.floor(index / 4) == Math.floor(previousIndex / 4)
-      || Math.abs(index - (previousIndex - 4)) <= 1 && Math.floor(index / 4) == Math.floor(previousIndex / 4) - 1
-      || Math.abs(index - (previousIndex + 4)) <= 1 && Math.floor(index / 4) == Math.floor(previousIndex / 4) + 1
+      || Math.abs(index - previousIndex) == 1 && Math.floor(index / 4) == Math.floor(previousIndex / 4) //same row, 1 col away
+      || Math.abs(index - (previousIndex - 4)) <= 1 && Math.floor(index / 4) == Math.floor(previousIndex / 4) - 1 //row above, 3 adjacent
+      || Math.abs(index - (previousIndex + 4)) <= 1 && Math.floor(index / 4) == Math.floor(previousIndex / 4) + 1 //row below, 3 adjacent
     ) {
       this.setState({
         sequence: this.state.sequence.concat(index)
@@ -282,42 +263,34 @@ class Game extends React.Component {
     }
     if (!this.state.usedWords.includes(attempt) && this.wordList.includes(attempt)) {
       this.setState({
-        usedWords: this.state.usedWords.concat(attempt)
+        usedWords: this.state.usedWords.concat(attempt),
+        totalScore: this.state.totalScore + this.getWordScore(attempt)
       })
       this.newWordSound.currentTime = 0
       this.newWordSound.play()
     }
   }
 
-  getFunctions() {
-    return {
-      getAttemptColor: this.getAttemptColor.bind(this),
-      isInAttempt: this.isInAttempt.bind(this),
-      tryUpdateSequence: this.tryUpdateSequence.bind(this),
-      submitAttempt: this.submitAttempt.bind(this)
-    }
-  }
-
   render() {
     return (
-      <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-        <div style={{position: "absolute", top: "50%", transform: "translate(0%, -50%)"}}>
-          <div className="game" style={{fontSize: "5vmin"}}>
-            Score: {this.getTotalScore()}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <div style={{ position: "absolute", top: "50%", transform: "translate(0%, -50%)" }}>
+          <div className="format" style={{ fontSize: "5vmin" }}>
+            Score: {this.state.totalScore}
           </div>
-          <div className="game" style={{fontSize: "3vmin"}}>
+          <div className="format" style={{ fontSize: "3vmin" }}>
             Time Remaining: {this.state.timeRemaining}
           </div>
-          <div className="game">
-            <Board tiles={this.state.tiles} functions={this.getFunctions()} />
+          <div className="format">
+            <Board tiles={this.state.tiles} functions={this.functions} />
           </div>
-          <div className="game">
+          <div className="format">
             <button onClick={() => {
-              this.newWordSound = new Audio(newWordSound)
-              this.newWordSound.play()
-              this.newWordSound.pause()
+              if (this.newWordSound == undefined) {
+                this.newWordSound = new Audio(newWordSound) //chrome audio autoplay policy, user must have interacted once
+              }
               this.startNewGame()
-              }} style={{fontSize: "5vmin"}}>Start New Game</button>
+            }} style={{ fontSize: "5vmin" }}>Start New Game</button>
           </div>
         </div>
       </div>
@@ -325,7 +298,8 @@ class Game extends React.Component {
   }
 }
 
-// ========================================
-
-const root = ReactDOM.createRoot(document.getElementById("root"))
-root.render(<Game />)
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <Game />
+  </React.StrictMode>,
+)
