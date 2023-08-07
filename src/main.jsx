@@ -192,7 +192,7 @@ class Game extends React.Component {
       if (this.state.timeRemaining == 1) {
         this.submitAttempt()
       }
-      this.setState({
+      this.setState({ //TODO: use more accurate timer/prevent drift
         timeRemaining: this.state.timeRemaining - 1
       }, () => {
         if (this.state.timeRemaining == 0) {
