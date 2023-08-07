@@ -1,6 +1,6 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
-  margin: 3vmin;
+  margin: calc(3 * min(1svw, 1svh));
   touch-action: none;
   background-color: beige;
   user-select: none;
@@ -9,25 +9,24 @@ body {
 
 .square {
   background: #fff;
-  border: 0.15vmin solid #999;
+  border: calc(0.15 * min(1svw, 1svh)) solid #999;
   float: left;
-  height: 18vmin;
+  width: calc(19 * min(1svw, 1svh));
+  height: calc(19 * min(1svw, 1svh));
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
-  width: 18vmin;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 2vmin;
+  border-radius: calc(2 * min(1svw, 1svh));
 }
 
 .detector {
   background: transparent;
-  border: 0.15vmin solid none;
   width: 70%;
   height: 70%;
-  font-size: 7vmin;
+  font-size: calc(7 * min(1svw, 1svh));
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -37,12 +36,12 @@ body {
 .format {
   display: flex;
   justify-content: center;
-  margin-bottom: 1vmin;
+  margin-bottom: calc(min(1svw, 1svh));
 }
 
 button {
   background-color: beige;
-  border: 0.15vmin solid #999;
-  border-radius: 2vmin;
+  border: calc(0.15 * min(1svw, 1svh)) solid #999;
+  border-radius: calc(2 * min(1svw, 1svh));
   color: black;
 }

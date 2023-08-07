@@ -271,7 +271,7 @@ class Game extends React.Component {
         totalScore: this.state.totalScore + this.getWordScore(attempt)
       })
       this.newWordSound.currentTime = 0
-      this.newWordSound.play()
+      this.newWordSound.play() //TODO: fix audio sometimes not playing
     }
   }
 
@@ -301,6 +301,8 @@ class Game extends React.Component {
     )
   }
 }
+
+//TODO: disable magnifying class on ios
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
