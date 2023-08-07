@@ -37,8 +37,8 @@ class Board extends React.Component {
   }
 
   onMove(info) {
-    if (this.state.pointerDown && info.target.className == "detector") {
-      const index = parseInt(info.target.id.slice("detectorIndex".length))
+    if (this.state.pointerDown && this.getTarget(info).className == "detector") {
+      const index = parseInt(this.getTarget(info).id.slice("detectorIndex".length))
       this.props.functions.tryUpdateSequence(index)
     }
   }
@@ -47,8 +47,8 @@ class Board extends React.Component {
     this.setState({
       pointerDown: true
     })
-    if (info.target.className == "detector") {
-      const index = parseInt(info.target.id.slice("detectorIndex".length))
+    if (this.getTarget(info).className == "detector") {
+      const index = parseInt(this.getTarget(info).id.slice("detectorIndex".length))
       this.props.functions.tryUpdateSequence(index)
     }
   }
@@ -58,6 +58,10 @@ class Board extends React.Component {
       pointerDown: false
     })
     this.props.functions.submitAttempt()
+  }
+
+  getTarget(info) { //event.target doesn't work on mobile
+    return document.elementFromPoint(info.clientX, info.clientY)
   }
 
   render() {

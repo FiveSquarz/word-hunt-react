@@ -4,6 +4,7 @@ body {
   touch-action: none;
   background-color: beige;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .square {
